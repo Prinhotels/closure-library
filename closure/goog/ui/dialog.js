@@ -545,6 +545,14 @@ goog.ui.Dialog.prototype.getDraggable = function() {
 
 
 /**
+ * @return {goog.fx.Dragger} Dragger being used in case dragging is enabled.
+ */
+goog.ui.Dialog.prototype.getDragger = function() {
+  return this.dragger_;
+};
+
+
+/**
  * Enables or disables dragging.
  * @param {boolean} enabled Whether to enable it.
  * @private
