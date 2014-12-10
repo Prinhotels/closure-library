@@ -229,10 +229,8 @@ goog.ui.tree.BaseNode.prototype.initAccessibility = function() {
 
 /** @override */
 goog.ui.tree.BaseNode.prototype.createDom = function() {
-  // TODO(jakubvrana): Use safeHtmlToDocumentFragment() once it is ready.
-  var element = this.getDomHelper().htmlToDocumentFragment(
-      goog.html.SafeHtml.unwrap(this.toSafeHtml()));
-  this.setElementInternal(/** @type {Element} */ (element));
+  var element = this.getDomHelper().safeHtmlToNode(this.toSafeHtml());
+  this.setElementInternal(/** @type {!Element} */ (element));
 };
 
 
@@ -509,7 +507,7 @@ goog.ui.tree.BaseNode.prototype.contains = function(node) {
 
 /**
  * An array of empty children to return for nodes that have no children.
- * @type {!Array.<!goog.ui.tree.BaseNode>}
+ * @type {!Array<!goog.ui.tree.BaseNode>}
  * @private
  */
 goog.ui.tree.BaseNode.EMPTY_CHILDREN_ = [];
@@ -524,7 +522,7 @@ goog.ui.tree.BaseNode.prototype.getChildAt;
 
 /**
  * Returns the children of this node.
- * @return {!Array.<!goog.ui.tree.BaseNode>} The children.
+ * @return {!Array<!goog.ui.tree.BaseNode>} The children.
  */
 goog.ui.tree.BaseNode.prototype.getChildren = function() {
   var children = [];

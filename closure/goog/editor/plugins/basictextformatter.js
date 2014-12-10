@@ -1144,7 +1144,7 @@ goog.editor.plugins.BasicTextFormatter.prototype.removeFontSizeFromStyleAttrs_ =
 /**
  * Apply pre-execCommand fixes for IE.
  * @param {string} command The command to execute.
- * @return {!Array.<Node>} Array of nodes to be removed after the execCommand.
+ * @return {!Array<Node>} Array of nodes to be removed after the execCommand.
  *     Will never be longer than 2 elements.
  * @private
  */
@@ -1307,7 +1307,7 @@ goog.editor.plugins.BasicTextFormatter.prototype.fixSafariLists_ = function() {
       var range = node.ownerDocument.createRange();
       range.setStartAfter(previousElementSibling);
       range.setEndBefore(node);
-      if (!goog.string.isEmpty(range.toString())) {
+      if (!goog.string.isEmptyOrWhitespace(range.toString())) {
         return;
       }
       // Make sure both are lists of the same type (ordered or unordered)

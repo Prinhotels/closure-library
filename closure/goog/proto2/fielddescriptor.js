@@ -19,7 +19,6 @@
 goog.provide('goog.proto2.FieldDescriptor');
 
 goog.require('goog.asserts');
-goog.require('goog.proto2.Descriptor');
 goog.require('goog.string');
 
 
@@ -67,6 +66,15 @@ goog.proto2.FieldDescriptor = function(messageType, tag, metadata) {
 
   /** @type {*} */
   metadata.required;
+
+  /** @type {*} */
+  metadata.packed;
+
+  /**
+   * If true, this field is a packed field.
+   * @private {boolean}
+   */
+  this.isPacked_ = !!metadata.packed;
 
   /**
    * If true, this field is a repeating field.
@@ -163,10 +171,10 @@ goog.proto2.FieldDescriptor.prototype.getTag = function() {
 
 /**
  * Returns the descriptor describing the message that defined this field.
- * @return {goog.proto2.Descriptor} The descriptor.
+ * @return {!goog.proto2.Descriptor} The descriptor.
  */
 goog.proto2.FieldDescriptor.prototype.getContainingType = function() {
-  return goog.proto2.Descriptor.getDescriptor(this.parent_);
+  return this.parent_.getDescriptor();
 };
 
 
@@ -245,13 +253,10 @@ goog.proto2.FieldDescriptor.prototype.deserializationConversionPermitted =
  * Returns the descriptor of the message type of this field. Only valid
  * for fields of type GROUP and MESSAGE.
  *
- * @return {goog.proto2.Descriptor} The message descriptor.
+ * @return {!goog.proto2.Descriptor} The message descriptor.
  */
 goog.proto2.FieldDescriptor.prototype.getFieldMessageType = function() {
-  goog.asserts.assert(this.isCompositeType(), 'Expected message or group');
-  // Assert above ensures this.nativeType_ has a field descriptor.
-  return goog.proto2.Descriptor.getDescriptor(
-      /** @type {function(new:goog.proto2.Message)} */(this.nativeType_));
+  return this.nativeType_.getDescriptor();
 };
 
 
@@ -262,6 +267,15 @@ goog.proto2.FieldDescriptor.prototype.getFieldMessageType = function() {
 goog.proto2.FieldDescriptor.prototype.isCompositeType = function() {
   return this.fieldType_ == goog.proto2.FieldDescriptor.FieldType.MESSAGE ||
       this.fieldType_ == goog.proto2.FieldDescriptor.FieldType.GROUP;
+};
+
+
+/**
+ * Returns whether the field described by this descriptor is packed.
+ * @return {boolean} Whether the field is packed.
+ */
+goog.proto2.FieldDescriptor.prototype.isPacked = function() {
+  return this.isPacked_;
 };
 
 

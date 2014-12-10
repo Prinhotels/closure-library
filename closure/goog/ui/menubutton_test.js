@@ -200,6 +200,30 @@ function testHighlightFirstOnOpen() {
 
 /**
  * Check that the appropriate items are selected when menus are opened with the
+ * keyboard, setSelectFirstOnEnterOrSpace is not set, and the first menu item is
+ * disabled.
+ */
+function testHighlightFirstOnOpen_withFirstDisabled() {
+  var node = goog.dom.getElement('demoMenuButton');
+  menuButton.decorate(node);
+  var menu = menuButton.getMenu();
+  menu.getItemAt(0).setEnabled(false);
+
+  menuButton.handleKeyEvent(new MyFakeEvent(goog.events.KeyCodes.ENTER));
+  assertEquals(
+      'By default no items should be highlighted when opened with enter.',
+      null, menuButton.getMenu().getHighlighted());
+
+  menuButton.setOpen(false);
+  menuButton.handleKeyEvent(new MyFakeEvent(goog.events.KeyCodes.DOWN));
+  assertTrue('Menu must open after down key', menuButton.isOpen());
+  assertEquals('First enabled menuitem must be highlighted',
+      'menuItem2', menuButton.getMenu().getHighlighted().getElement().id);
+}
+
+
+/**
+ * Check that the appropriate items are selected when menus are opened with the
  * keyboard and setSelectFirstOnEnterOrSpace is set.
  */
 function testHighlightFirstOnOpen_withEnterOrSpaceSet() {
@@ -210,6 +234,25 @@ function testHighlightFirstOnOpen_withEnterOrSpaceSet() {
   assertEquals('The first item should be highlighted when opened with enter ' +
       'after setting selectFirstOnEnterOrSpace',
       'menuItem1', menuButton.getMenu().getHighlighted().getElement().id);
+}
+
+
+/**
+ * Check that the appropriate item is selected when a menu is opened with the
+ * keyboard, setSelectFirstOnEnterOrSpace is true, and the first menu item is
+ * disabled.
+ */
+function testHighlightFirstOnOpen_withEnterOrSpaceSetAndFirstDisabled() {
+  var node = goog.dom.getElement('demoMenuButton');
+  menuButton.decorate(node);
+  menuButton.setSelectFirstOnEnterOrSpace(true);
+  var menu = menuButton.getMenu();
+  menu.getItemAt(0).setEnabled(false);
+
+  menuButton.handleKeyEvent(new MyFakeEvent(goog.events.KeyCodes.ENTER));
+  assertEquals('The first enabled item should be highlighted when opened ' +
+      'with enter after setting selectFirstOnEnterOrSpace',
+      'menuItem2', menuButton.getMenu().getHighlighted().getElement().id);
 }
 
 
@@ -262,44 +305,20 @@ function testEnterOpensMenu() {
 
 
 /**
- * Tests the behavior of the enter and space keys when the menu is open and
- * setCloseOnEnterOrSpace was not called, or called with true as its argument.
+ * Tests the behavior of the enter and space keys when the menu is open.
  */
 function testSpaceOrEnterClosesMenu() {
   var node = goog.dom.getElement('demoMenuButton');
   menuButton.decorate(node);
-  menuButton.setCloseOnEnterOrSpace(true);
 
   menuButton.setOpen(true);
   menuButton.handleKeyEvent(new MyFakeEvent(goog.events.KeyCodes.ENTER));
-  assertFalse('Menu should close after pressing Enter when ' +
-      'setCloseOnEnterOrSpace is set', menuButton.isOpen());
+  assertFalse('Menu should close after pressing Enter', menuButton.isOpen());
 
   menuButton.setOpen(true);
   menuButton.handleKeyEvent(new MyFakeEvent(goog.events.KeyCodes.SPACE,
       goog.events.EventType.KEYUP));
-  assertFalse('Menu should close after pressing Space when ' +
-      'setCloseOnEnterOrSpace is set', menuButton.isOpen());
-}
-
-
-/**
- * Tests the behavior of the enter and space keys when the menu is open and
- * setCloseOnEnterOrSpace was called with false as its argument.
- */
-function testSpaceOrEnterLeavesMenuOpen_withCloseOnEnterOrSpaceDisabled() {
-  var node = goog.dom.getElement('demoMenuButton');
-  menuButton.decorate(node);
-  menuButton.setCloseOnEnterOrSpace(false);
-
-  menuButton.setOpen(true);
-  menuButton.handleKeyEvent(new MyFakeEvent(goog.events.KeyCodes.ENTER));
-  assertTrue('Menu should remain open after pressing Enter',
-      menuButton.isOpen());
-  menuButton.handleKeyEvent(new MyFakeEvent(goog.events.KeyCodes.SPACE,
-      goog.events.EventType.KEYUP));
-  assertTrue('Menu should remain open after pressing Space',
-      menuButton.isOpen());
+  assertFalse('Menu should close after pressing Space', menuButton.isOpen());
 }
 
 

@@ -13,6 +13,7 @@
 // limitations under the License.
 goog.provide('goog.testing.JsUnitException');
 goog.provide('goog.testing.asserts');
+goog.provide('goog.testing.asserts.ArrayLike');
 
 goog.require('goog.testing.stacktrace');
 
@@ -61,7 +62,7 @@ goog.testing.asserts.numberRoughEqualityPredicate_ = function(
 
 
 /**
- * @type {Object.<string, function(*, *, number): boolean>}
+ * @type {Object<string, function(*, *, number): boolean>}
  * @private
  */
 goog.testing.asserts.primitiveRoughEqualityPredicates_ = {
@@ -1100,7 +1101,7 @@ var assertRegExp = function(a, b, opt_c) {
 /**
  * Converts an array like object to array or clones it if it's already array.
  * @param {goog.testing.asserts.ArrayLike} arrayLike The collection.
- * @return {!Array.<?>} Copy of the collection as array.
+ * @return {!Array<?>} Copy of the collection as array.
  * @private
  */
 goog.testing.asserts.toArray_ = function(arrayLike) {
