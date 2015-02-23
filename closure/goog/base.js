@@ -145,7 +145,7 @@ goog.exportPath_ = function(name, opt_object, opt_objectToExportTo) {
 
 
 /**
- * Defines a named value. In uncompiled mode, the value is retreived from
+ * Defines a named value. In uncompiled mode, the value is retrieved from
  * CLOSURE_DEFINES or CLOSURE_UNCOMPILED_DEFINES if the object is defined and
  * has the property specified, and otherwise used the defined defaultValue.
  * When compiled the default can be overridden using the compiler
@@ -179,7 +179,7 @@ goog.define = function(name, defaultValue) {
  * because they are generally used for debugging purposes and it is difficult
  * for the JSCompiler to statically determine whether they are used.
  */
-goog.DEBUG = true;
+goog.define('goog.DEBUG', true);
 
 
 /**
@@ -223,7 +223,8 @@ goog.define('goog.TRUSTED_SITE', true);
  *
  * This define can be used to trigger alternate implementations compatible with
  * running in EcmaScript Strict mode or warn about unavailable functionality.
- * See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions_and_function_scope/Strict_mode
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions_and_function_scope/Strict_mode
+ *
  */
 goog.define('goog.STRICT_MODE_COMPATIBLE', false);
 
@@ -236,12 +237,24 @@ goog.define('goog.DISALLOW_TEST_ONLY_CODE', COMPILED && !goog.DEBUG);
 
 
 /**
- * Creates object stubs for a namespace.  The presence of one or more
- * goog.provide() calls indicate that the file defines the given
- * objects/namespaces.  Provided objects must not be null or undefined.
- * Build tools also scan for provide/require statements
+ * Defines a namespace in Closure.
+ *
+ * A namespace may only be defined once in a codebase. It may be defined using
+ * goog.provide() or goog.module().
+ *
+ * The presence of one or more goog.provide() calls in a file indicates
+ * that the file defines the given objects/namespaces.
+ * Provided symbols must not be null or undefined.
+ *
+ * In addition, goog.provide() creates the object stubs for a namespace
+ * (for example, goog.provide("goog.foo.bar") will create the object
+ * goog.foo.bar if it does not already exist).
+ *
+ * Build tools also scan for provide/require/module statements
  * to discern dependencies, build dependency files (see deps.js), etc.
+ *
  * @see goog.require
+ * @see goog.module
  * @param {string} name Namespace provided by this file in the form
  *     "goog.package.part".
  */
@@ -283,7 +296,7 @@ goog.constructNamespace_ = function(name, opt_obj) {
 
 /**
  * Module identifier validation regexp.
- * Note: This is a conservative check, it is very possible to be more lienent,
+ * Note: This is a conservative check, it is very possible to be more lenient,
  *   the primary exclusion here is "/" and "\" and a leading ".", these
  *   restrictions are intended to leave the door open for using goog.require
  *   with relative file paths rather than module identifiers.
@@ -293,22 +306,31 @@ goog.VALID_MODULE_RE_ = /^[a-zA-Z_$][a-zA-Z0-9._$]*$/;
 
 
 /**
- * goog.module serves two purposes:
- * - marks a file that must be loaded as a module
- * - reserves a namespace (it can not also be goog.provided)
- * and has three requirements:
+ * Defines a module in Closure.
+ *
+ * Marks that this file must be loaded as a module and claims the namespace.
+ *
+ * A namespace may only be defined once in a codebase. It may be defined using
+ * goog.provide() or goog.module().
+ *
+ * goog.module() has three requirements:
  * - goog.module may not be used in the same file as goog.provide.
  * - goog.module must be the first statement in the file.
  * - only one goog.module is allowed per file.
- * When a goog.module annotated file is loaded, it is loaded enclosed in
+ *
+ * When a goog.module annotated file is loaded, it is enclosed in
  * a strict function closure. This means that:
- * - any variable declared in a goog.module file are private to the file,
- * not global. Although the compiler is expected to inline the module.
+ * - any variables declared in a goog.module file are private to the file
+ * (not global), though the compiler is expected to inline the module.
  * - The code must obey all the rules of "strict" JavaScript.
  * - the file will be marked as "use strict"
  *
  * NOTE: unlike goog.provide, goog.module does not declare any symbols by
- * itself.
+ * itself. If declared symbols are desired, use
+ * goog.module.declareLegacyNamespace().
+ *
+ *
+ * See the public goog.module proposal: http://goo.gl/Va1hin
  *
  * @param {string} name Namespace provided by this file in the form
  *     "goog.package.part", is expected but not required.
@@ -347,6 +369,7 @@ goog.module = function(name) {
  * indicate a hard dependency, instead it is used to indicate
  * an optional dependency or to access the exports of a module
  * that has already been loaded.
+ * @suppress {missingProvide}
  */
 goog.module.get = function(name) {
   return goog.module.getInternal_(name);
@@ -398,6 +421,7 @@ goog.isInModuleLoader_ = function() {
  * TODO(johnlenz): Make the test framework aware of goog.module so
  * that this isn't necessary. Alternately combine this with goog.setTestOnly
  * to minimize boiler plate.
+ * @suppress {missingProvide}
  */
 goog.module.declareTestMethods = function() {
   if (!goog.isInModuleLoader_()) {
@@ -412,6 +436,7 @@ goog.module.declareTestMethods = function() {
  * Provide the module's exports as a globally accessible object under the
  * module's declared name.  This is intended to ease migration to goog.module
  * for files that have existing usages.
+ * @suppress {missingProvide}
  */
 goog.module.declareLegacyNamespace = function() {
   if (!COMPILED && !goog.isInModuleLoader_()) {
@@ -760,8 +785,8 @@ goog.instantiatedSingletons_ = [];
 /**
  * @define {boolean} Whether to load goog.modules using {@code eval} when using
  * the debug loader.  This provides a better debugging experience as the
- * source is unmodified and can be edited using Chrome Workspaces or
- * similiar.  However in some environments the use of {@code eval} is banned
+ * source is unmodified and can be edited using Chrome Workspaces or similar.
+ * However in some environments the use of {@code eval} is banned
  * so we provide an alternative.
  */
 goog.define('goog.LOAD_MODULE_USING_EVAL', true);
@@ -884,8 +909,8 @@ if (goog.DEPENDENCIES_ENABLED) {
 
 
   /** @const @private {boolean} */
-  goog.IS_OLD_IE_ = goog.global.document &&
-      goog.global.document.all && !goog.global.atob;
+  goog.IS_OLD_IE_ = !goog.global.atob && goog.global.document &&
+      goog.global.document.all;
 
 
   /**
@@ -935,7 +960,7 @@ if (goog.DEPENDENCIES_ENABLED) {
     }
   };
 
-  // On IE9 and ealier, it is necessary to handle
+  // On IE9 and earlier, it is necessary to handle
   // deferred module loads. In later browsers, the
   // code to be evaluated is simply inserted as a script
   // block in the correct order. To eval deferred
@@ -1091,9 +1116,11 @@ if (goog.DEPENDENCIES_ENABLED) {
 
 
   /**
-   * @private @const {function(string):?}
+   * @param {string} source
+   * @return {!Object}
+   * @private
    */
-  goog.loadModuleFromSource_ = function() {
+  goog.loadModuleFromSource_ = function(source) {
     // NOTE: we avoid declaring parameters or local variables here to avoid
     // masking globals or leaking values into the module definition.
     'use strict';
@@ -1599,12 +1626,12 @@ goog.getUid = function(obj) {
 
 
 /**
- * Whether the given object is alreay assigned a unique ID.
+ * Whether the given object is already assigned a unique ID.
  *
  * This does not modify the object.
  *
  * @param {!Object} obj The object to check.
- * @return {boolean} Whether there an assigned unique id for the object.
+ * @return {boolean} Whether there is an assigned unique id for the object.
  */
 goog.hasUid = function(obj) {
   return !!obj[goog.UID_PROPERTY_];
@@ -2301,7 +2328,7 @@ if (!COMPILED) {
  *
  * @param {Function} superClass The superclass, Object or null.
  * @param {goog.defineClass.ClassDescriptor} def
- *     An object literal describing the
+ *     An object literal describing
  *     the class.  It may have the following properties:
  *     "constructor": the constructor function
  *     "statics": an object literal containing methods to add to the constructor
@@ -2349,6 +2376,7 @@ goog.defineClass = function(superClass, def) {
  *     !Object|
  *     {constructor:!Function}|
  *     {constructor:!Function, statics:(Object|function(Function):void)}}
+ * @suppress {missingProvide}
  */
 goog.defineClass.ClassDescriptor;
 
@@ -2419,7 +2447,7 @@ goog.defineClass.OBJECT_PROTOTYPE_FIELDS_ = [
 // TODO(johnlenz): share this function with the goog.object
 /**
  * @param {!Object} target The object to add properties to.
- * @param {!Object} source The object to copy properites from.
+ * @param {!Object} source The object to copy properties from.
  * @private
  */
 goog.defineClass.applyProperties_ = function(target, source) {
