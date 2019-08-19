@@ -336,6 +336,14 @@ goog.ui.Dialog.prototype.setPreferredAriaRole = function(role) {
 
 
 /**
+ * @return {goog.fx.Dragger} Dragger being used in case dragging is enabled.
+ */
+goog.ui.Dialog.prototype.getDragger = function() {
+  return this.dragger_;
+};
+
+
+/**
  * Renders if the DOM is not created.
  * @private
  */

@@ -173,7 +173,7 @@ goog.net.DefaultXmlHttpFactory.prototype.createInstance = function() {
   if (progId) {
     return new ActiveXObject(progId);
   } else {
-    return new XMLHttpRequest();
+    return /** @type {!goog.net.XhrLike}*/(new XMLHttpRequest());
   }
 };
 
